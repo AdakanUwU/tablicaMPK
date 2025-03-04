@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamiczny Tekst</title>
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .display-box {
+            width: 3400px;
+            height: 720px;
+            background-color: white;
+            border: 5px solid black;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            overflow: hidden;
+            padding: 10px 20px;
+        }
+        .number-display {
+            width: 25%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(300px, 50vw, 800px);
+            height: 100%;
+        }
+        .text-display {
+            width: 73%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            position: relative;
+            padding: 20px 0;
+        }
+        .line {
+            height: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            font-size: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+        }
+        .line span {
+            display: inline-block;
+            transform-origin: center;
+            text-align: center;
+            width: 100%;
+        }
+        .input-box, .number-box {
+            font-size: 32px;
+            padding: 15px;
+            max-width: 200px;
+            text-align: center;
+        }
+        .number-box {
+            width: 100px;
+        }
+        .color-select {
+            width: 40px;
+            height: 40px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        window.onload = function() {
+            document.body.style.zoom = "45%";
+        };
+    </script>
+
+    <div class="display-box" id="output">
+        <div class="number-display" id="numberDisplay"><span></span></div>
+        <div class="text-display">
+            <div class="line" id="line1"><span></span></div>
+            <div class="line" id="line2"><span></span></div>
+        </div>
+    </div>
+    <div class="input-container">
+        <input type="text" class="number-box" id="numberInput" placeholder="Liczba..." oninput="updateText()">
+        <button class="color-select" id="numberColor" style="background-color: #000000;" onclick="setColor(this, 'numberColor')"></button>
+        <input type="text" class="input-box" id="textInput1" placeholder="Pierwsza linijka..." oninput="updateText()">
+        <button class="color-select" id="colorInput1" style="background-color: #000000;" onclick="setColor(this, 'colorInput1')"></button>
+        <input type="text" class="input-box" id="textInput2" placeholder="Druga linijka..." oninput="updateText()">
+        <button class="color-select" id="colorInput2" style="background-color: #000000;" onclick="setColor(this, 'colorInput2')"></button>
+    </div>
+    <script>
+        const colors = ['#000000', '#FF0000', '#21A35C', '#00A7B6'];
+        
+        function setColor(button, inputId) {
+            let currentColor = button.style.backgroundColor;
+            let currentIndex = colors.indexOf(rgbToHex(currentColor));
+            let newIndex = (currentIndex + 1) % colors.length;
+            let newColor = colors[newIndex];
+            button.style.backgroundColor = newColor;
+            document.getElementById(inputId).value = newColor;
+            updateText();
+        }
+        
+        function rgbToHex(rgb) {
+            let rgbArray = rgb.match(/\d+/g).map(Number);
+            return `#${rgbArray.map(x => x.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
+        }
+        
+        function updateText() {
+            let number = document.getElementById("numberInput").value;
+            let input1 = document.getElementById("textInput1").value;
+            let input2 = document.getElementById("textInput2").value;
+            let color1 = document.getElementById("colorInput1").value;
+            let color2 = document.getElementById("colorInput2").value;
+            let numberColor = document.getElementById("numberColor").value;
+            
+            let numberDisplay = document.getElementById("numberDisplay");
+            let numberDisplaySpan = document.getElementById("numberDisplay").querySelector("span");
+            let line1Span = document.getElementById("line1").querySelector("span");
+            let line2Span = document.getElementById("line2").querySelector("span");
+            
+            numberDisplaySpan.innerText = number || " ";
+            numberDisplaySpan.style.color = numberColor;
+            line1Span.innerText = input1 || " ";
+            line2Span.innerText = input2 || " ";
+            line1Span.style.color = color1;
+            line2Span.style.color = color2;
+
+            adjustTextWidth(numberDisplaySpan, document.getElementById("numberDisplay"));
+            adjustTextWidth(line1Span, document.getElementById("line1"));
+            adjustTextWidth(line2Span, document.getElementById("line2"));
+        }
+
+        function adjustTextWidth(textElement, container) {
+            let containerWidth = container.clientWidth;
+            let textWidth = textElement.scrollWidth;
+            
+            if (textWidth > containerWidth) {
+                let scaleX = containerWidth / textWidth;
+                textElement.style.transform = `scaleX(${scaleX})`;
+                textElement.style.width = `${textWidth}px`;
+            } else {
+                textElement.style.transform = "scaleX(1)";
+                textElement.style.width = "100%";
+            }
+        }
+    </script>
+</body>
+</html>
